@@ -1,0 +1,14 @@
+services:
+  oatlify:
+    build: .
+    container_name: oatlify
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_PATH: /app/data/oatlify.db
+      PORT: "8000"
+    volumes:
+      - ./data:/app/data

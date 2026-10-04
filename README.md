@@ -35,6 +35,24 @@ TELEGRAM_CHAT_ID=123456789
 
 ## Run
 
+### Docker (recommended for a server)
+
+```bash
+cp .env.example .env   # add your Telegram credentials
+docker compose up -d --build
+```
+
+The app runs on port **8000** with `restart: unless-stopped`. Price history is persisted in a SQLite database mounted at `./data/oatlify.db`, so it survives container rebuilds and updates. Logs: `docker logs -f oatlify`.
+
+To update:
+
+```bash
+git pull
+docker compose up -d --build
+```
+
+### Without Docker
+
 ```bash
 python app.py
 ```
