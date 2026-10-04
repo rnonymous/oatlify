@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Oatlify — Oatly Price Monitor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f8; color: #1a2b3c; min-height: 100vh; }
+    header { background: #0b3d2e; color: #fff; padding: 2rem 1.5rem; text-align: center; }
+    header h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    header p { color: #bcd9cd; }
+    main { max-width: 860px; margin: 2rem auto; padding: 0 1rem; }
+    .card { background: #fff; border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .card h2 { font-size: 1.15rem; margin-bottom: 1rem; color: #0b3d2e; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 0.5rem 0.5rem; border-bottom: 1px solid #edf1f4; font-size: 0.95rem; }
+    th { color: #5a7184; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .price { font-weight: 700; font-size: 1.05rem; }
+    .drop { color: #1a8f4e; }
+    .badge { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; background: #e8eef4; color: #41586b; }
+    .badge.ah { background: #e6f4ec; color: #0b7a3e; }
+    .badge.jumbo { background: #fbe9e7; color: #c62828; }
+    a { color: #0b6bcb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    footer { text-align: center; color: #8195a6; font-size: 0.85rem; padding: 2rem 0; }
+    .refresh-btn { background: #0b6bcb; color: #fff; border: none; border-radius: 8px; padding: 0.55rem 1.1rem; font-size: 0.9rem; cursor: pointer; margin-bottom: 1.5rem; }
+    .refresh-btn:disabled { background: #9db8ce; cursor: wait; }
+    .status-msg { font-size: 0.85rem; color: #5a7184; margin-left: 0.75rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🥛 Oatlify</h1>
+    <p>Oatly price monitor — Albert Heijn &amp; Jumbo</p>
+  </header>
+  <main>
+    <button class="refresh-btn" id="refresh" onclick="refreshPrices(this)">Check prices now</button>
+    <span class="status-msg" id="status"></span>
+
+    {% for product in products %}
+    <div class="card">
+      <h2>{{ product.key | replace('-', ' ') | title }}</h2>
+      <table>
+        <thead>
+          <tr><th>Store</th><th>Product</th><th>Price</th><th>Last checked</th></tr>
+        </thead>
+        <tbody>
+          {% for s in product.stores %}
+          <tr>
+            <td><span class="badge {{ s.store }}">{{ 'Albert Heijn' if s.store == 'ah' else 'Jumbo' }}</span></td>
+            <td><a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.name }}</a></td>
+            <td class="price">
+              {% if s.price %}€ {{ '%.2f' % s.price }}{% else %}—{% endif %}
+            </td>
+            <td>{{ s.checked_at or 'never' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endfor %}
+  </main>
+  <footer>Price drops are sent to the configured Telegram bot.</footer>
+  <script>
+    async function refreshPrices(btn) {
+      btn.disabled = true;
+      document.getElementById('status').textContent = 'Checking prices…';
+      try {
+        const res = await fetch('/api/check', { method: 'POST' });
+        if (!res.ok) throw new Error('check failed');
+        document.getElementById('status').textContent = 'Done — page reloading…';
+        setTimeout(() => location.reload(), 800);
+      } catch (e) {
+        document.getElementById('status').textContent = 'Failed: ' + e.message;
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
