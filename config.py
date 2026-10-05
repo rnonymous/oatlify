@@ -17,40 +17,40 @@ class Config:
 TELEGRAM_API = "https://api.telegram.org/bot{token}/{method}"
 
 PRODUCTS = {
-    "oatly-original": [
+    "barista-1-5l": [
         {
             "store": "ah",
-            "name": "Oatly The Original Haverdrank Vol 1L",
-            "url": "https://www.prijsprofeet.nl/product/ah_wi548463/oatly-haverdrank-vol",
+            "name": "Oatly Barista Edition 1,5L",
+            "url": "https://www.prijsprofeet.nl/product/ah_wi570853/oatly-biologische-barista-haver",
         },
         {
             "store": "jumbo",
-            "name": "Oatly The Original Haverdrank Vol 1L",
-            "url": "https://www.jumbo.com/producten/oatly-the-original-haverdrank-vol-1-l-215260KRT",
+            "name": "Oatly Barista Edition 1,5L",
+            "url": "https://www.jumbo.com/producten/oatly-the-original-barista-edition-oat-drink-large-format-1,5-l-634513PAK",
         },
     ],
-    "oatly-barista": [
+    "barista-1l": [
         {
             "store": "ah",
-            "name": "Oatly Haver Barista Edition 1L",
+            "name": "Oatly Barista Edition 1L",
             "url": "https://www.prijsprofeet.nl/product/ah_wi412158/oatly-haver-barista-edition",
         },
         {
             "store": "jumbo",
-            "name": "Oatly Barista Edition Oat Drink 1,5L",
-            "url": "https://www.jumbo.com/producten/oatly-the-original-barista-edition-oat-drink-large-format-1,5-l-634513PAK",
+            "name": "Oatly Barista Edition 1L",
+            "url": "https://www.jumbo.com/producten/oatly-the-original-haver-barista-edition-1-l-184289STK",
         },
     ],
-    "oatly-halfvol": [
+    "barista-light-1l": [
         {
             "store": "ah",
-            "name": "Oatly Haverdrank Halfvol 1L",
-            "url": "https://www.prijsprofeet.nl/product/ah_wi475225/oatly-haverdrank-halfvol",
+            "name": "Oatly Barista Edition Lighter Taste 1L",
+            "url": "https://www.prijsprofeet.nl/product/ah_wi580284/oatly-barista-edition-lighter-taste",
         },
         {
             "store": "jumbo",
-            "name": "Oatly The Original Haverdrank Halfvol 1L",
-            "url": "https://www.jumbo.com/producten/oatly-the-original-haverdrank-halfvol-1-l-215261KRT",
+            "name": "Oatly Barista Light 1L",
+            "url": "https://www.jumbo.com/producten/oatly-the-original-barista-light-haverdrank-1-l-634365PAK",
         },
     ],
 }

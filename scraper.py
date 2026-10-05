@@ -47,6 +47,8 @@ def _json_ld_product_price(html):
                 offer = offer[0] if offer else {}
             if "price" in offer:
                 return _parse_price(offer["price"])
+            if "lowPrice" in offer:
+                return _parse_price(offer["lowPrice"])
     return None
 
 
