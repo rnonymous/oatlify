@@ -21,7 +21,7 @@ PRODUCTS = {
         {
             "store": "ah",
             "name": "Oatly Barista Edition 1,5L",
-            "url": "https://www.prijsprofeet.nl/product/ah_wi570853/oatly-biologische-barista-haver",
+            "url": "https://www.prijsprofeet.nl/product/ah_wi580285/oatly-barista-edition-oat-drink",
         },
         {
             "store": "jumbo",
