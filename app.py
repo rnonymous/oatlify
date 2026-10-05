@@ -1,11 +1,14 @@
 import logging
 
 from apscheduler.schedulers.background import BackgroundScheduler
-from flask import Flask, jsonify, render_template
+from flask import Flask, Response, jsonify, render_template
 
+from bot import start_bot
+from charts import price_chart_svg
 from config import Config, PRODUCTS
 from monitor import check_all_products
-from storage import get_latest_prices, get_price_history
+from notifier import send_telegram_message
+from storage import get_latest_prices
 
 logging.basicConfig(
     level=logging.INFO,
@@ -60,7 +63,15 @@ def api_prices():
 
 @app.route("/api/prices/<product_key>/<store>")
 def api_history(product_key, store):
+    from storage import get_price_history
+
     return jsonify(get_price_history(product_key, store))
+
+
+@app.route("/api/chart/<product_key>/<store>.svg")
+def api_chart(product_key, store):
+    svg = price_chart_svg(product_key, store)
+    return Response(svg, mimetype="image/svg+xml")
 
 
 @app.route("/api/check", methods=["POST"])
@@ -69,7 +80,33 @@ def api_check():
     return jsonify(results)
 
 
+@app.route("/api/notify/test", methods=["POST"])
+def api_notify_test():
+    text = (
+        "🥛 <b>Oatlify test notification</b>\n\n"
+        "If you can read this, Telegram notifications are working. "
+        "Price drops will look like this.\n\n"
+        "<i>Example:</i>\n"
+        "Oatly Haver Barista Edition 1L\n"
+        "Was: € 2.89\n"
+        "Now: <b>€ 1.45</b> (−€ 1.44)"
+    )
+    ok = send_telegram_message(text)
+    if ok:
+        return jsonify({"ok": True, "message": "Test notification sent"})
+    return (
+        jsonify(
+            {
+                "ok": False,
+                "message": "Failed to send — check TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID",
+            }
+        ),
+        500,
+    )
+
+
 scheduler.start()
+start_bot()
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=Config.PORT, debug=False)

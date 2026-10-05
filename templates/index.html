@@ -24,9 +24,16 @@
     a { color: #0b6bcb; text-decoration: none; }
     a:hover { text-decoration: underline; }
     footer { text-align: center; color: #8195a6; font-size: 0.85rem; padding: 2rem 0; }
-    .refresh-btn { background: #0b6bcb; color: #fff; border: none; border-radius: 8px; padding: 0.55rem 1.1rem; font-size: 0.9rem; cursor: pointer; margin-bottom: 1.5rem; }
-    .refresh-btn:disabled { background: #9db8ce; cursor: wait; }
+    .btn { border: none; border-radius: 8px; padding: 0.55rem 1.1rem; font-size: 0.9rem; cursor: pointer; margin-bottom: 1.5rem; }
+    .btn:disabled { cursor: wait; opacity: 0.6; }
+    .btn-primary { background: #0b6bcb; color: #fff; }
+    .btn-secondary { background: #e8eef4; color: #0b3d2e; }
     .status-msg { font-size: 0.85rem; color: #5a7184; margin-left: 0.75rem; }
+    .toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 0; }
+    .charts { margin-top: 1rem; }
+    .chart-block { margin-top: 0.75rem; }
+    .chart-block h3 { font-size: 0.8rem; color: #5a7184; margin-bottom: 0.35rem; font-weight: 600; }
+    .chart-block img { width: 100%; height: auto; border: 1px solid #edf1f4; border-radius: 8px; display: block; }
   </style>
 </head>
 <body>
@@ -35,8 +42,11 @@
     <p>Oatly price monitor — Albert Heijn &amp; Jumbo</p>
   </header>
   <main>
-    <button class="refresh-btn" id="refresh" onclick="refreshPrices(this)">Check prices now</button>
-    <span class="status-msg" id="status"></span>
+    <div class="toolbar">
+      <button class="btn btn-primary" id="refresh" onclick="refreshPrices(this)">Check prices now</button>
+      <button class="btn btn-secondary" id="testnotify" onclick="sendTest(this)">Send test notification</button>
+      <span class="status-msg" id="status"></span>
+    </div>
 
     {% for product in products %}
     <div class="card">
@@ -58,21 +68,46 @@
           {% endfor %}
         </tbody>
       </table>
+      <div class="charts">
+        {% for s in product.stores %}
+        <div class="chart-block">
+          <h3>{{ 'Albert Heijn' if s.store == 'ah' else 'Jumbo' }} — price history</h3>
+          <img src="/api/chart/{{ product.key }}/{{ s.store }}.svg" alt="Price history chart"
+               loading="lazy" onerror="this.outerHTML='<div class=chart-block></div>'">
+        </div>
+        {% endfor %}
+      </div>
     </div>
     {% endfor %}
   </main>
-  <footer>Price drops are sent to the configured Telegram bot.</footer>
+  <footer>Price drops are sent to the configured Telegram bot. Bot commands: /price · /lowest · /help</footer>
   <script>
+    function setStatus(msg) { document.getElementById('status').textContent = msg; }
+
     async function refreshPrices(btn) {
       btn.disabled = true;
-      document.getElementById('status').textContent = 'Checking prices…';
+      setStatus('Checking prices…');
       try {
         const res = await fetch('/api/check', { method: 'POST' });
         if (!res.ok) throw new Error('check failed');
-        document.getElementById('status').textContent = 'Done — page reloading…';
+        setStatus('Done — page reloading…');
         setTimeout(() => location.reload(), 800);
       } catch (e) {
-        document.getElementById('status').textContent = 'Failed: ' + e.message;
+        setStatus('Failed: ' + e.message);
+        btn.disabled = false;
+      }
+    }
+
+    async function sendTest(btn) {
+      btn.disabled = true;
+      setStatus('Sending test notification…');
+      try {
+        const res = await fetch('/api/notify/test', { method: 'POST' });
+        const data = await res.json();
+        setStatus(data.message);
+      } catch (e) {
+        setStatus('Failed to send test notification');
+      } finally {
         btn.disabled = false;
       }
     }
